@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:evantez/app/router/router_constant.dart';
 import 'package:evantez/src/model/repository/auth/auth_controller.dart';
 import 'package:evantez/src/model/repository/resource/employee_repository.dart';
@@ -142,33 +144,41 @@ class EmployeeListView extends StatelessWidget {
     final controller = context.watch<EmployeesController>();
     final auth = context.watch<AuthController>();
     return Expanded(
-        child: ListView.builder(
-            itemCount: controller.employeeLists.length,
-            padding: EdgeInsets.only(
-                bottom: kSize.height * 0.08,
-                left: AppConstants.baseBorderRadius,
-                right: AppConstants.baseBorderRadius),
-            itemBuilder: (context, index) {
-              return InkWell(
-                highlightColor: AppColors.transparent,
-                splashColor: AppColors.transparent,
-                onTap: () {
-                  //
+        child: RefreshIndicator(
+      onRefresh: () {
+        return controller.employeeList(token: auth.accesToken ?? '');
+      },
+      child: ListView.builder(
+          itemCount: controller.employeeLists.length,
+          padding: EdgeInsets.only(
+              bottom: kSize.height * 0.08,
+              left: AppConstants.baseBorderRadius,
+              right: AppConstants.baseBorderRadius),
+          itemBuilder: (context, index) {
+            return InkWell(
+              highlightColor: AppColors.transparent,
+              splashColor: AppColors.transparent,
+              onTap: () async {
+                //
 
-                  controller.employeeDetails(
-                      token: auth.accesToken ?? '',
-                      id: controller.employeeLists[index].id ?? 0);
-                  controller.employeePayments(
-                      token: auth.accesToken ?? '',
-                      id: controller.employeeLists[index].id ?? 0);
+                await controller.employeeDetails(
+                    token: auth.accesToken ?? '',
+                    id: controller.employeeLists[index].id ?? 0);
+                await controller.employeePayments(
+                    token: auth.accesToken ?? '',
+                    id: controller.employeeLists[index].id ?? 0);
+                await controller.employeeRating(
+                    token: auth.accesToken ?? '',
+                    id: controller.employeeLists[index].id ?? 0);
 
-                  Navigator.pushNamed(
-                      context, RouterConstants.employeeDetailViewRoute);
-                },
-                child: EmployeeTile(
-                  index: index,
-                ),
-              );
-            }));
+                Navigator.pushNamed(
+                    context, RouterConstants.employeeDetailViewRoute);
+              },
+              child: EmployeeTile(
+                index: index,
+              ),
+            );
+          }),
+    ));
   }
 }

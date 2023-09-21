@@ -1,7 +1,9 @@
-// ignore_for_file: unnecessary_null_comparison, use_build_context_synchronously
+// ignore_for_file: unnecessary_null_comparison, use_build_context_synchronously, deprecated_member_use
 
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:evantez/app/app.dart';
 import 'package:evantez/src/model/core/models/employeetype/employeetype_model.dart';
 import 'package:evantez/src/providers/resources/employee_type/employee_type_viewstate.dart';
@@ -10,9 +12,17 @@ import 'package:evantez/src/serializer/models/employee_list_response.dart';
 import 'package:evantez/src/serializer/models/employee_payment_details.dart';
 import 'package:evantez/src/serializer/models/employee_request.dart';
 import 'package:evantez/src/serializer/models/employee_types_response.dart';
+import 'package:evantez/src/serializer/models/rating_history.dart';
 import 'package:evantez/src/view/core/widgets/drop_down_value.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:developer';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../serializer/models/employee_proof_response.dart';
 import '../../components/snackbar_widget.dart';
 
@@ -180,6 +190,19 @@ class EmployeesController extends ChangeNotifier {
 
   //=-=-=-=-=-=-=-= Add Employee  =-=-=-=-=-=-=-=
 
+  File? selectedImage;
+
+  MultipartFile? imagesData;
+  imageToMultipart() async {
+    if (selectedImage?.path != null && selectedImage!.path.isNotEmpty) {
+      imagesData = await MultipartFile.fromFile(selectedImage?.path ?? '',
+          filename: selectedImage?.path.split('/').last);
+      notifyListeners();
+    }
+
+    log('Images links=============${imagesData?.filename}');
+  }
+
   Future<void> employeeAdd(
       {required String token, required BuildContext context}) async {
     try {
@@ -200,6 +223,7 @@ class EmployeesController extends ChangeNotifier {
               code: 'String',
               user: 1,
               dob: date,
+              image: imagesData ?? MultipartFile(const Stream.empty(), 0),
               bloodGroup: bloodGroupController.text));
       if (response != null) {
         rootScaffoldMessengerKey.currentState!.showSnackBar(
@@ -324,6 +348,50 @@ class EmployeesController extends ChangeNotifier {
       nameTypeController.text = data.name ?? '';
       codeController.text = data.code ?? '';
       amount.text = data.amount ?? '';
+    }
+  }
+
+//=-=-=-=-=-=-= Employee Rating List =-=-=-=-=-=-=
+  EmployeeRatingHistory? employeeRatingList;
+  Future<void> employeeRating({required String token, required int id}) async {
+    try {
+      isloading = true;
+      final response =
+          await EmployeeProvider().loadEmployeeHistory(token: token, id: id);
+      if (response != null) {
+        employeeRatingList = response;
+        notifyListeners();
+      }
+      isloading = false;
+    } catch (e) {
+      log('message');
+      isloading = false;
+    }
+  }
+
+//=-=-=-=-=-=-=-=-=-= Employee Status Change =-=-=-=-=-=
+  bool isValue = false;
+  changeValue(v) {
+    isValue = v;
+
+    log("$isValue");
+    notifyListeners();
+  }
+
+  Future<void> employeeStatus(
+      {required String token, required int id, required bool status}) async {
+    try {
+      isloading = true;
+      final response = await EmployeeProvider()
+          .employeeStatus(token: token, id: id, status: status);
+      if (response != null) {
+        employeeData = response;
+        notifyListeners();
+      }
+      isloading = false;
+    } catch (e) {
+      log('message');
+      isloading = false;
     }
   }
 }

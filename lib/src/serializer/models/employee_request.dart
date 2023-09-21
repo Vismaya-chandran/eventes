@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 class EmployeeRequest {
   final String? currentRating;
   final String? code;
@@ -13,6 +15,7 @@ class EmployeeRequest {
   final int? idProofType;
   final String? name;
   final int? phone;
+  final MultipartFile? image;
 
   EmployeeRequest({
     this.currentRating,
@@ -29,25 +32,26 @@ class EmployeeRequest {
     this.idProofType,
     this.name,
     this.phone,
+    this.image,
   });
 
   factory EmployeeRequest.fromJson(Map<String, dynamic> json) =>
       EmployeeRequest(
-        currentRating: json["current_rating"],
-        code: json["code"],
-        isActive: json["is_active"],
-        dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
-        bloodGroup: json["blood_group"],
-        homeContact: json["home_contact"],
-        email: json["email"],
-        address: json["address"],
-        idProofNumber: json["id_proof_number"],
-        employeeType: json["employee_type"],
-        user: json["user"],
-        idProofType: json["id_proof_type"],
-        name: json["name"],
-        phone: json["phone"],
-      );
+          currentRating: json["current_rating"],
+          code: json["code"],
+          isActive: json["is_active"],
+          dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
+          bloodGroup: json["blood_group"],
+          homeContact: json["home_contact"],
+          email: json["email"],
+          address: json["address"],
+          idProofNumber: json["id_proof_number"],
+          employeeType: json["employee_type"],
+          user: json["user"],
+          idProofType: json["id_proof_type"],
+          name: json["employee_name"],
+          phone: json["employee_mobile"],
+          image: json['image']);
 
   Map<String, dynamic> toJson() => {
         "current_rating": currentRating,
@@ -63,7 +67,8 @@ class EmployeeRequest {
         "employee_type": employeeType,
         "user": user,
         "id_proof_type": idProofType,
-        "name": name,
-        "phone": phone,
+        "employee_name": name,
+        "employee_mobile": phone,
+        "image": image,
       };
 }

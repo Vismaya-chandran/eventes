@@ -1,10 +1,13 @@
 // ignore_for_file: unrelated_type_equality_checks
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:evantez/src/model/repository/resource/employee_repository.dart';
 import 'package:evantez/src/view/core//constants/constants.dart';
 import 'package:evantez/src/view/core//themes/colors.dart';
 import 'package:evantez/src/view/core//themes/typography.dart';
+import 'package:evantez/src/view/core/constants/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class EmployeeTile extends StatelessWidget {
@@ -70,7 +73,13 @@ class EmployeeTile extends StatelessWidget {
                     ),
                     height: kSize.height * 0.080,
                     width: kSize.height * 0.080,
-                    child: const Placeholder(),
+                    child: CachedNetworkImage(
+                      errorWidget: (context, error, stackTrace) {
+                        return SvgPicture.asset(AppImages.camera);
+                      },
+                      placeholder: (context, url) => const Placeholder(),
+                      imageUrl: controller.employeeLists[index].image ?? '',
+                    ),
                   ),
                   SizedBox(
                     width: kSize.width * 0.01,
@@ -80,7 +89,7 @@ class EmployeeTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        controller.employeeLists[index].homeContact ?? '',
+                        controller.employeeLists[index].employeeName ?? '',
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.poppinsMedium.copyWith(
                           fontSize: 14,

@@ -1,16 +1,22 @@
 import 'dart:developer';
 
+import 'package:evantez/src/model/components/date_time_picker.dart';
+import 'package:evantez/src/model/repository/resource/employee_repository.dart';
 import 'package:evantez/src/view/core//constants/constants.dart';
 import 'package:evantez/src/view/core//themes/colors.dart';
 import 'package:evantez/src/view/core//themes/typography.dart';
 import 'package:evantez/src/view/core//widgets/custom_rating_star.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HistoryTile extends StatelessWidget {
-  const HistoryTile({super.key});
+  HistoryTile({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<EmployeesController>();
     final kSize = MediaQuery.of(context).size;
     return Container(
       padding: EdgeInsets.symmetric(
@@ -31,14 +37,15 @@ class HistoryTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'EV-1568',
+                'EV-${controller.employeeRatingList?.id ?? 0}',
                 style: AppTypography.poppinsMedium.copyWith(
                   color: AppColors.secondaryColor.withOpacity(0.4),
                   fontSize: 14,
                 ),
               ),
               Text(
-                '8 Nov 2023',
+                apiFormat.format(
+                    controller.employeeRatingList?.createdAt ?? DateTime.now()),
                 style: AppTypography.poppinsMedium.copyWith(
                   color: AppColors.secondaryColor.withOpacity(0.4),
                   fontSize: 14,
@@ -59,14 +66,26 @@ class HistoryTile extends StatelessWidget {
           SizedBox(
             height: kSize.height * 0.01,
           ),
-          labelRow(label: "Venue", value: 'HHHHHHHHHHH'),
-          labelRow(label: "Category", value: 'A Boy'),
-          labelRow(label: "Due", value: '₹ 1000'),
+          labelRow(
+              label: "Venue",
+              value: controller.employeeRatingList?.venue ?? 'No Data'),
+          labelRow(
+              label: "Category",
+              value: controller.employeeRatingList?.category ?? ''),
+          labelRow(
+              label: "Due",
+              value: '₹ ${controller.employeeRatingList?.due ?? '0.0'}'),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              labelRow(label: "Payment", value: '₹ 5000'),
-              paymentStatus(),
+              labelRow(
+                  label: "Payment",
+                  value:
+                      '₹ ${controller.employeeRatingList?.payment ?? '0.0'}'),
+              controller.employeeRatingList?.status == null
+                  ? const SizedBox()
+                  : paymentStatus(
+                      status: controller.employeeRatingList?.status ?? ''),
             ],
           ),
         ],
@@ -74,12 +93,14 @@ class HistoryTile extends StatelessWidget {
     );
   }
 
-  Widget paymentStatus() {
+  Widget paymentStatus({required String status}) {
     return Container(
-      decoration: BoxDecoration(color: AppColors.statusPending, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+          color: AppColors.statusPending,
+          borderRadius: BorderRadius.circular(16)),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: Text(
-        "Payment Pending",
+        status,
         style: AppTypography.poppinsRegular.copyWith(
           color: AppColors.secondaryColor,
         ),

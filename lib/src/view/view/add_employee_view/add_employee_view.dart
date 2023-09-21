@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:evantez/src/model/repository/auth/auth_controller.dart';
 import 'package:evantez/src/model/repository/resource/employee_repository.dart';
 import 'package:evantez/src/view/core//constants/app_images.dart';
@@ -7,6 +9,7 @@ import 'package:evantez/src/view/core//widgets/custom_dropdown_search.dart';
 import 'package:evantez/src/view/core//widgets/custom_textfield.dart';
 import 'package:evantez/src/view/core//widgets/footer_button.dart';
 import 'package:evantez/src/view/core/widgets/common_drop_down.dart';
+import 'package:evantez/src/view/view/add_employee_view/image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +42,7 @@ class AddEmployeeView extends StatelessWidget {
                 0),
             child: Column(
               children: [
-                uploadProImage(kSize),
+                uploadProImage(kSize, context),
                 SizedBox(
                   height: kSize.height * 0.040,
                 ),
@@ -178,24 +181,49 @@ class AddEmployeeView extends StatelessWidget {
     );
   }
 
-  Widget uploadProImage(Size kSize) {
+  Widget uploadProImage(Size kSize, BuildContext context) {
+    final controller = context.watch<EmployeesController>();
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.only(bottom: AppConstants.basePadding),
-          padding: const EdgeInsets.all(AppConstants.marginSpace),
-          clipBehavior: Clip.antiAlias,
-          height: kSize.height * 0.072,
-          width: kSize.height * 0.072,
-          decoration: const BoxDecoration(
-            color: AppColors.accentColor,
-            shape: BoxShape.circle,
-          ),
-          child: SvgPicture.asset(
-            AppImages.camera,
-            colorFilter: const ColorFilter.mode(
-                AppColors.secondaryColor, BlendMode.srcIn),
-            // color: AppColors.secondaryColor,
+        InkWell(
+          onTap: () async {
+            final selectedImage = await ImageUtils.imagePopUp(context);
+            if (selectedImage != null) {
+              controller.selectedImage = selectedImage;
+              controller.imageToMultipart();
+              controller.notifyListeners();
+            }
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: AppConstants.basePadding),
+            padding: const EdgeInsets.all(AppConstants.marginSpace),
+            clipBehavior: Clip.antiAlias,
+            height: kSize.height * 0.072,
+            width: kSize.height * 0.072,
+            decoration: const BoxDecoration(
+              color: AppColors.accentColor,
+              shape: BoxShape.circle,
+            ),
+            child: controller.selectedImage != null
+                ? Container(
+                    height: kSize.height * 0.090,
+                    width: kSize.height * 0.072,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: Image.file(
+                      controller.selectedImage ?? File(''),
+                      fit: BoxFit.fitHeight,
+                      height: kSize.height * 100,
+                      width: kSize.height * 0.072,
+                    ),
+                  )
+                : SvgPicture.asset(
+                    AppImages.camera,
+                    colorFilter: const ColorFilter.mode(
+                        AppColors.secondaryColor, BlendMode.srcIn),
+                    // color: AppColors.secondaryColor,
+                  ),
           ),
         ),
         Text(

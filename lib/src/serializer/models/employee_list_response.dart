@@ -48,47 +48,51 @@ class EmployeeListResponse {
   final int? employeeType;
   final int? user;
   final int? idProofType;
+  final String? employeeName;
+  final String? image;
 
-  EmployeeListResponse({
-    this.id,
-    this.createdAt,
-    this.updatedAt,
-    this.currentRating,
-    this.code,
-    this.isActive,
-    this.dob,
-    this.bloodGroup,
-    this.homeContact,
-    this.email,
-    this.address,
-    this.idProofNumber,
-    this.employeeType,
-    this.user,
-    this.idProofType,
-  });
+  EmployeeListResponse(
+      {this.id,
+      this.createdAt,
+      this.updatedAt,
+      this.currentRating,
+      this.code,
+      this.isActive,
+      this.dob,
+      this.bloodGroup,
+      this.homeContact,
+      this.email,
+      this.address,
+      this.idProofNumber,
+      this.employeeType,
+      this.user,
+      this.idProofType,
+      this.employeeName,
+      this.image});
 
   factory EmployeeListResponse.fromJson(Map<String, dynamic> json) =>
       EmployeeListResponse(
-        id: json["id"],
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-        currentRating: json["current_rating"],
-        code: json["code"],
-        isActive: json["is_active"],
-        dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
-        bloodGroup: json["blood_group"],
-        homeContact: json["home_contact"],
-        email: json["email"],
-        address: json["address"],
-        idProofNumber: json["id_proof_number"],
-        employeeType: json["employee_type"],
-        user: json["user"],
-        idProofType: json["id_proof_type"],
-      );
+          id: json["id"],
+          createdAt: json["created_at"] == null
+              ? null
+              : DateTime.parse(json["created_at"]),
+          updatedAt: json["updated_at"] == null
+              ? null
+              : DateTime.parse(json["updated_at"]),
+          currentRating: json["current_rating"],
+          code: json["code"],
+          isActive: json["is_active"],
+          dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
+          bloodGroup: json["blood_group"],
+          homeContact: json["home_contact"],
+          email: json["email"],
+          address: json["address"],
+          idProofNumber: json["id_proof_number"],
+          employeeType: json["employee_type"],
+          user: json["user"],
+          idProofType: json["id_proof_type"],
+          employeeName: json['employee_name'],
+          image: json['image']);
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -107,5 +111,7 @@ class EmployeeListResponse {
         "employee_type": employeeType,
         "user": user,
         "id_proof_type": idProofType,
+        "employee_name": employeeName,
+        "image": image
       };
 }

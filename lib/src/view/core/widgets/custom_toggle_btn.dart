@@ -32,17 +32,22 @@ class _CustomToggleBtnState extends State<CustomToggleBtn> {
               height: kSize.height * 0.032,
               width: kSize.width * 0.16,
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(vertical: kSize.height * 0.0015, horizontal: kSize.width * 0.01),
+              padding: EdgeInsets.symmetric(
+                  vertical: kSize.height * 0.0015,
+                  horizontal: kSize.width * 0.01),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppConstants.basePadding),
-                color: active.value ? AppColors.statusSuccess : AppColors.statusCritical,
+                color: active.value
+                    ? AppColors.statusSuccess
+                    : AppColors.statusCritical,
               ),
               duration: const Duration(milliseconds: 100),
               child: Stack(
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(
-                        vertical: kSize.height * 0.0015, horizontal: kSize.width * 0.013),
+                        vertical: kSize.height * 0.0015,
+                        horizontal: kSize.width * 0.013),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,7 +78,9 @@ class _CustomToggleBtnState extends State<CustomToggleBtn> {
                   ),
                   AnimatedAlign(
                     curve: Curves.ease,
-                    alignment: active.value ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: active.value
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     duration: const Duration(milliseconds: 100),
                     child: Container(
                       height: kSize.height * 0.027,

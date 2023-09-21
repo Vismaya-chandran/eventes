@@ -5,6 +5,7 @@ import 'package:evantez/src/serializer/models/employee_list_response.dart';
 import 'package:evantez/src/serializer/models/employee_payment_details.dart';
 import 'package:evantez/src/serializer/models/employee_request.dart';
 import 'package:evantez/src/serializer/models/employee_types_response.dart';
+import 'package:evantez/src/serializer/models/rating_history.dart';
 import 'package:evantez/src/view/core/event_api.dart';
 
 import '../../../serializer/models/employee_proof_response.dart';
@@ -70,8 +71,11 @@ class EmployeeProvider extends EventApi {
   //=-=-=-=-=-=-= Employee ADdd =-=-=-=-=-=-=
   Future<EmployeeDetails> addEmployee(
       {required String token, required EmployeeRequest data}) async {
+    final formData =
+        FormData.fromMap(data.toJson(), ListFormat.multiCompatible);
+
     Response response = await post('users/employee/',
-        data: data.toJson(), headers: apiHeaders(token));
+        data: formData, headers: apiHeaders(token));
     switch (response.statusCode) {
       case 200:
       case 201:
@@ -131,6 +135,36 @@ class EmployeeProvider extends EventApi {
       case 200:
       case 201:
         return response.data;
+      default:
+        throw Exception('Response Error');
+    }
+  }
+
+  //=-=-=-=-=-=-=-= Employees Rating =-=-=-=-=-=-=
+  Future<EmployeeRatingHistory> loadEmployeeHistory(
+      {required String token, required int id}) async {
+    Response response = await get('users/employee-rating-history/$id/',
+        headers: apiHeaders(token));
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        return EmployeeRatingHistory.fromJson(response.data);
+
+      default:
+        throw Exception('Response Error');
+    }
+  }
+
+  //=-=-=-=-=-=-=-= Employees Status Change =-=-=-=-=-=-=
+  Future<EmployeeDetails> employeeStatus(
+      {required String token, required int id, required bool status}) async {
+    Response response = await patch('users/employee/$id/',
+        data: {"is_active": status}, headers: apiHeaders(token));
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        return EmployeeDetails.fromJson(response.data);
+
       default:
         throw Exception('Response Error');
     }

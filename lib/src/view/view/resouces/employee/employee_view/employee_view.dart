@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:evantez/src/model/repository/auth/auth_controller.dart';
 import 'package:evantez/src/model/repository/resource/employee_repository.dart';
 import 'package:evantez/src/view/core//constants/app_images.dart';
@@ -82,8 +83,20 @@ class EmployeeDetailView extends StatelessWidget {
 
     return Row(
       children: [
-        CircleAvatar(
-          radius: kSize.height * 0.050,
+        Container(
+          height: 90,
+          width: 90,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(160)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(200),
+            child: CachedNetworkImage(
+                errorWidget: (context, error, stackTrace) {
+                  return SvgPicture.asset(AppImages.camera);
+                },
+                placeholder: (context, url) => const Placeholder(),
+                fit: BoxFit.cover,
+                imageUrl: controller.employeeData?.image ?? ''),
+          ),
         ),
         SizedBox(
           width: kSize.width * 0.018,
@@ -93,7 +106,7 @@ class EmployeeDetailView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Employee Name',
+              controller.employeeData?.name ?? '',
               style: AppTypography.poppinsSemiBold.copyWith(fontSize: 24),
             ),
             Row(
@@ -158,6 +171,8 @@ class EmployeeDetailView extends StatelessWidget {
 
   Widget basicInfo(BuildContext context, Size kSize) {
     final controller = context.watch<EmployeesController>();
+    final auth = context.watch<AuthController>();
+
     return Expanded(
       child: SingleChildScrollView(
         child: Padding(
@@ -179,8 +194,17 @@ class EmployeeDetailView extends StatelessWidget {
                   ),
                   CustomToggleBtn(
                     onChanged: (value) {
-                      //
-                      log("$value");
+                      if (value) {
+                        controller.employeeStatus(
+                            token: auth.accesToken ?? '',
+                            id: controller.employeeData?.id ?? 0,
+                            status: true);
+                      } else {
+                        controller.employeeStatus(
+                            token: auth.accesToken ?? '',
+                            id: controller.employeeData?.id ?? 0,
+                            status: false);
+                      }
                     },
                   ),
                 ],
@@ -293,7 +317,7 @@ class EmployeeDetailView extends StatelessWidget {
                 height: kSize.height * 0.01,
               ),
               Text(
-                "AIHU999777888",
+                controller.employeeData?.idProofNumber ?? '',
                 maxLines: 4,
                 style: AppTypography.poppinsRegular.copyWith(
                   color: AppColors.secondaryColor.withOpacity(0.6),
@@ -331,7 +355,7 @@ class EmployeeDetailView extends StatelessWidget {
                 height: kSize.height * 0.01,
               ),
               Text(
-                "₹ 20568",
+                " ${controller.employeeData?.totalEarning ?? '0.0'}",
                 maxLines: 4,
                 style: AppTypography.poppinsRegular.copyWith(
                   color: AppColors.secondaryColor.withOpacity(0.6),
@@ -383,7 +407,7 @@ class EmployeeDetailView extends StatelessWidget {
                 ),
               ),
               Text(
-                "16762",
+                '120',
                 textAlign: TextAlign.end,
                 style: AppTypography.poppinsSemiBold.copyWith(
                   fontSize: 18,
@@ -413,13 +437,10 @@ class EmployeeDetailView extends StatelessWidget {
 
   Widget historyListing(Size kSize) {
     return Expanded(
-      child: ListView.builder(
-          itemCount: 10,
-          padding: EdgeInsets.only(bottom: kSize.height * 0.1),
-          itemBuilder: (context, index) {
-            return const HistoryTile();
-          }),
-    );
+        child: Padding(
+      padding: const EdgeInsets.only(top: 0, bottom: 130),
+      child: HistoryTile(),
+    ));
   }
 
   Widget searchField(Size kSize, BuildContext context) {
