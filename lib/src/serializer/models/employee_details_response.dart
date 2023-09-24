@@ -17,6 +17,7 @@ class EmployeeDetails {
   final String? name;
   final String? image;
   final int? totalEarning;
+  final String? phone;
 
   EmployeeDetails(
       {this.id,
@@ -35,6 +36,7 @@ class EmployeeDetails {
       this.user,
       this.idProofType,
       this.name,
+      this.phone,
       this.totalEarning,
       this.image});
 
@@ -61,6 +63,7 @@ class EmployeeDetails {
           idProofType: json["id_proof_type"],
           totalEarning: json["total_earnings"],
           image: json["image"],
+          phone: json["employee_mobile"],
           name: json['employee_name']);
 
   Map<String, dynamic> toJson() => {
@@ -82,6 +85,7 @@ class EmployeeDetails {
         "id_proof_type": idProofType,
         "employee_name": name,
         "image": image,
-        "total_earnings": totalEarning
+        "total_earnings": totalEarning,
+        "employee_mobile": phone
       };
 }

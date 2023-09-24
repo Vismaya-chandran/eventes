@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:evantez/src/model/repository/auth/auth_controller.dart';
 import 'package:evantez/src/model/repository/resource/employee_repository.dart';
@@ -193,8 +191,11 @@ class EmployeeDetailView extends StatelessWidget {
                     ),
                   ),
                   CustomToggleBtn(
+                    isStatus: controller.employeeData?.isActive ?? false,
                     onChanged: (value) {
                       if (value) {
+                        controller.isStatus = value;
+
                         controller.employeeStatus(
                             token: auth.accesToken ?? '',
                             id: controller.employeeData?.id ?? 0,
@@ -231,7 +232,8 @@ class EmployeeDetailView extends StatelessWidget {
               SizedBox(
                 height: kSize.height * 0.024,
               ),
-              proInfo(AppStrings.phoneText, ''),
+              proInfo(
+                  AppStrings.phoneText, controller.employeeData?.phone ?? ''),
               SizedBox(
                 height: kSize.height * 0.024,
               ),

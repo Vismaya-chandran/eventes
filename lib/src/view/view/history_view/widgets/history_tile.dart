@@ -58,7 +58,7 @@ class HistoryTile extends StatelessWidget {
           ),
           CustomRatingStar(
             onRating: (value) {
-              log('$value');
+              log('sdfghjk$value');
             },
             ignoreGestures: false,
             initialRating: 3,

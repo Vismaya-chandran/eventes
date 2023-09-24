@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:evantez/app/app.dart';
 import 'package:evantez/src/model/core/models/employeetype/employeetype_model.dart';
 import 'package:evantez/src/providers/resources/employee_type/employee_type_viewstate.dart';
+import 'package:evantez/src/serializer/employee_type_id_response.dart';
 import 'package:evantez/src/serializer/models/employee_details_response.dart';
 import 'package:evantez/src/serializer/models/employee_list_response.dart';
 import 'package:evantez/src/serializer/models/employee_payment_details.dart';
@@ -96,12 +97,15 @@ class EmployeesController extends ChangeNotifier {
 
   bool isloading = false;
   List<EmployeeListResponse> employeeLists = [];
-  Future<void> employeeList({required String token}) async {
+  TextEditingController searchController = TextEditingController();
+  Future<void> employeeList({required String token, String? search}) async {
     try {
       isloading = true;
-      final response = await EmployeeProvider().loadEmployee(token: token);
+      final response = await EmployeeProvider()
+          .loadEmployee(token: token, search: search ?? '');
       if (response != null) {
         employeeLists = response;
+
         notifyListeners();
       }
       isloading = false;
@@ -111,7 +115,23 @@ class EmployeesController extends ChangeNotifier {
     }
   }
 
+  initStateOdloading({required String token, required int id}) async {
+    await employeeDetails(token: token, id: id);
+    await employeePayments(token: token, id: id);
+    await employeeRating(token: token, id: id);
+    notifyListeners();
+  }
+
   //=-=-=-=-=-=-=-= Employee Details =-=-==-=-=-=-=
+  DropDownValue returnListValue(int id, List<DropDownValue> listValue) {
+    int index = listValue.indexWhere((e) => e.id == id);
+    if (index != -1) {
+      return listValue[index];
+    } else {
+      return DropDownValue();
+    }
+  }
+
   EmployeeDetails? employeeData;
   Future<void> employeeDetails({required String token, required int id}) async {
     try {
@@ -121,8 +141,12 @@ class EmployeesController extends ChangeNotifier {
           await EmployeeProvider().loadEmployeeDetails(token: token, id: id);
       if (response != null) {
         employeeData = response;
-        selectedPosition = types
-            .firstWhere((element) => element.id == employeeData?.employeeType);
+        selectedPosition =
+            returnListValue(employeeData?.employeeType ?? 0, types);
+        // selectedPosition = types
+        //     .firstWhere((element) => element.id == employeeData?.employeeType);
+        await employeeTypeId(id: id, token: token);
+
         notifyListeners();
       }
       isloading = false;
@@ -138,8 +162,10 @@ class EmployeesController extends ChangeNotifier {
     log("${selectedItem?.value}");
   }
 
-  void changePosition(DropDownValue value) {
+  Future<void> changePosition(DropDownValue value,
+      {required int id, required String token}) async {
     selectedPosition = value;
+    await employeeTypeId(id: id, token: token);
     notifyListeners();
   }
 
@@ -188,6 +214,19 @@ class EmployeesController extends ChangeNotifier {
     }
   }
 
+  clearFields() {
+    nameController.clear();
+    phoneController.clear();
+    addressController.clear();
+    emailController.clear();
+    homeContact.clear();
+    selectedItem = null;
+    selectedId = null;
+    idNumber.clear();
+    selectedImage = null;
+    bloodGroupController.clear();
+    notifyListeners();
+  }
   //=-=-=-=-=-=-=-= Add Employee  =-=-=-=-=-=-=-=
 
   File? selectedImage;
@@ -394,4 +433,31 @@ class EmployeesController extends ChangeNotifier {
       isloading = false;
     }
   }
+
+  bool isStatus = false;
+
+  EmployeeTypeIdResponse? emptype;
+  Future<void> employeeTypeId({required String token, required int id}) async {
+    try {
+      isloading = true;
+      final response = await EmployeeProvider().employeeTypeId(
+          token: token,
+          id: id,
+          amount: 0,
+          name: selectedPosition?.value ?? '',
+          code: 'string');
+      if (response != null) {
+        emptype = response;
+        notifyListeners();
+      }
+      isloading = false;
+    } catch (e) {
+      log('message');
+      isloading = false;
+    }
+  }
+
+  //=-=-=-=-=-=-= Global Key =-=-=-=-=-=
+  final GlobalKey<FormState> empKey =
+      GlobalKey<FormState>(debugLabel: 'employee_key');
 }

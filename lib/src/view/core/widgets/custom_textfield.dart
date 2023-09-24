@@ -35,6 +35,7 @@ class CustomTextField extends StatefulWidget {
     this.label,
     required this.text,
     this.passwordField = false,
+    this.formatter,
     this.required,
     this.obscureText,
     this.onSubmit,
@@ -46,7 +47,7 @@ class CustomTextField extends StatefulWidget {
   final String? errorMessage;
   final int? maxLength;
   final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
+  final FormFieldValidator? validator;
   final Function(String?)? onSubmit;
   final TextEditingController? controller;
   final Function()? onTap;
@@ -73,6 +74,7 @@ class CustomTextField extends StatefulWidget {
   final bool? required;
   final TextStyle? labelStyle;
   final EdgeInsets? contentPadding;
+  final TextInputFormatter? formatter;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -112,9 +114,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
           width: kSize.width,
           child: TextFormField(
             readOnly: widget.readOnly ?? false,
+
             maxLines: widget.maxLines,
             onChanged: widget.onChanged,
-            inputFormatters: widget.inputFormatters,
+            inputFormatters:
+                widget.formatter != null ? [widget.formatter!] : null,
             autofocus: widget.autofocus ?? false,
             cursorColor: AppColors.secondaryColor,
             obscureText: widget.passwordField ? obscureText : false,

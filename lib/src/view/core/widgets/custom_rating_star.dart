@@ -58,21 +58,25 @@ class _CustomRatingStarState extends State<CustomRatingStar> {
                 ratingWidget: RatingWidget(
                   full: SvgPicture.asset(
                     AppImages.starFill,
-                    colorFilter: const ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(
+                        AppColors.primaryColor, BlendMode.srcIn),
                   ),
                   half: SvgPicture.asset(
                     AppImages.star,
-                    colorFilter: const ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(
+                        AppColors.primaryColor, BlendMode.srcIn),
                   ),
                   empty: SvgPicture.asset(
                     AppImages.star,
-                    colorFilter: const ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(
+                        AppColors.primaryColor, BlendMode.srcIn),
                   ),
                 ),
                 itemSize: widget.height ?? kSize.height * 0.016,
                 itemCount: 5,
                 initialRating: widget.initialRating ?? 0,
-                itemPadding: EdgeInsets.only(right: widget.padding ?? kSize.width * 0.005),
+                itemPadding: EdgeInsets.only(
+                    right: widget.padding ?? kSize.width * 0.005),
                 updateOnDrag: true,
                 allowHalfRating: false,
                 ignoreGestures: widget.ignoreGestures ?? true,

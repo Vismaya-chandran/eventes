@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:evantez/src/model/core/base_api_utilities.dart';
+import 'package:evantez/src/serializer/employee_type_id_response.dart';
 import 'package:evantez/src/serializer/models/employee_details_response.dart';
 import 'package:evantez/src/serializer/models/employee_list_response.dart';
 import 'package:evantez/src/serializer/models/employee_payment_details.dart';
@@ -12,9 +13,9 @@ import '../../../serializer/models/employee_proof_response.dart';
 
 class EmployeeProvider extends EventApi {
   Future<List<EmployeeListResponse>> loadEmployee(
-      {required String token}) async {
-    Response response =
-        await get('users/employee/', headers: apiHeaders(token));
+      {required String token, required String search}) async {
+    Response response = await get('users/employee/?employee_name=$search',
+        headers: apiHeaders(token));
     switch (response.statusCode) {
       case 200:
         return (response.data['results'] as List)
@@ -101,6 +102,29 @@ class EmployeeProvider extends EventApi {
     }
   }
 
+  //=-=-=-=-=-=-=-= Employee Patch ID =-=-=-=-=-=-=
+
+  Future<EmployeeTypeIdResponse> employeeTypeId(
+      {required String token,
+      required int id,
+      String? name,
+      String? code,
+      int? amount}) async {
+    Response response = await patch('users/employee-type/$id/',
+        headers: apiHeaders(token),
+        data: {
+          "name": name,
+          "code": code,
+          "amount": amount,
+        });
+    switch (response.statusCode) {
+      case 200:
+        return EmployeeTypeIdResponse.fromJson(response.data);
+
+      default:
+        throw Exception('Response Error');
+    }
+  }
   //=-=-=-=-=-=-= Add Employee Type =-=-=-=-=-=-=
 
   Future<dynamic> addEmployeeType(

@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:evantez/app/router/router_constant.dart';
 import 'package:evantez/src/model/repository/auth/auth_controller.dart';
 import 'package:evantez/src/model/repository/resource/employee_repository.dart';
@@ -17,11 +19,51 @@ import '../../../../core/themes/colors.dart';
 import '../../../../core/themes/typography.dart';
 import '../../../../core/widgets/custom_textfield.dart';
 
-class EmployeeListView extends StatelessWidget {
+class EmployeeListView extends StatefulWidget {
   const EmployeeListView({super.key});
 
   @override
+  State<EmployeeListView> createState() => _EmployeeListViewState();
+}
+
+class _EmployeeListViewState extends State<EmployeeListView> {
+  Timer? searchOnStoppedTyping;
+  String lastChanged = '';
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (searchOnStoppedTyping != null) {
+      searchOnStoppedTyping?.cancel();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final controller = context.watch<EmployeesController>();
+    final auth = context.watch<AuthController>();
+
+    search(value) {
+      if (lastChanged != value) {
+        setState(() {
+          lastChanged = value;
+        });
+        controller.employeeList(
+          token: auth.accesToken ?? '',
+          search: value,
+        );
+      }
+    }
+
+    onChangeHandler(value) {
+      const duration = Duration(milliseconds: 800);
+      if (searchOnStoppedTyping != null) {
+        setState(() => searchOnStoppedTyping?.cancel());
+      }
+      setState(
+          () => searchOnStoppedTyping = Timer(duration, () => search(value)));
+    }
+
     final kSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: appBar(context, kSize),
@@ -33,7 +75,7 @@ class EmployeeListView extends StatelessWidget {
             SizedBox(
               height: kSize.height * 0.032,
             ),
-            searchField(context, kSize),
+            searchField(context, kSize, onChangeHandler),
             SizedBox(
               height: kSize.height * 0.028,
             ),
@@ -60,7 +102,7 @@ class EmployeeListView extends StatelessWidget {
         IconButton(
             onPressed: () {
               //
-
+              controller.clearFields();
               controller.employeeTypesData(token: auth.accesToken ?? '');
               controller.employeeIdList(token: auth.accesToken ?? '');
               Navigator.pushNamed(
@@ -77,7 +119,10 @@ class EmployeeListView extends StatelessWidget {
     );
   }
 
-  Widget searchField(BuildContext context, Size kSize) {
+  Widget searchField(
+      BuildContext context, Size kSize, Function(String?)? onchanged) {
+    final controller = context.watch<EmployeesController>();
+
     return Padding(
       padding:
           const EdgeInsets.symmetric(horizontal: AppConstants.baseBorderRadius),
@@ -87,6 +132,9 @@ class EmployeeListView extends StatelessWidget {
         children: [
           Flexible(
             child: CustomTextField(
+              keyboardType: TextInputType.name,
+              onChanged: onchanged,
+              controller: controller.searchController,
               text: '',
               hintText: AppStrings.searchText,
               suffixIcon: Padding(
@@ -148,37 +196,31 @@ class EmployeeListView extends StatelessWidget {
       onRefresh: () {
         return controller.employeeList(token: auth.accesToken ?? '');
       },
-      child: ListView.builder(
-          itemCount: controller.employeeLists.length,
-          padding: EdgeInsets.only(
-              bottom: kSize.height * 0.08,
-              left: AppConstants.baseBorderRadius,
-              right: AppConstants.baseBorderRadius),
-          itemBuilder: (context, index) {
-            return InkWell(
-              highlightColor: AppColors.transparent,
-              splashColor: AppColors.transparent,
-              onTap: () async {
-                //
+      child: controller.employeeLists.isEmpty
+          ? const Center(child: Text('No Data Found!'))
+          : ListView.builder(
+              itemCount: controller.employeeLists.length,
+              padding: EdgeInsets.only(
+                  bottom: kSize.height * 0.08,
+                  left: AppConstants.baseBorderRadius,
+                  right: AppConstants.baseBorderRadius),
+              itemBuilder: (context, index) {
+                return InkWell(
+                  highlightColor: AppColors.transparent,
+                  splashColor: AppColors.transparent,
+                  onTap: () async {
+                    await controller.initStateOdloading(
+                        token: auth.accesToken ?? '',
+                        id: controller.employeeLists[index].id ?? 0);
 
-                await controller.employeeDetails(
-                    token: auth.accesToken ?? '',
-                    id: controller.employeeLists[index].id ?? 0);
-                await controller.employeePayments(
-                    token: auth.accesToken ?? '',
-                    id: controller.employeeLists[index].id ?? 0);
-                await controller.employeeRating(
-                    token: auth.accesToken ?? '',
-                    id: controller.employeeLists[index].id ?? 0);
-
-                Navigator.pushNamed(
-                    context, RouterConstants.employeeDetailViewRoute);
-              },
-              child: EmployeeTile(
-                index: index,
-              ),
-            );
-          }),
+                    Navigator.pushNamed(
+                        context, RouterConstants.employeeDetailViewRoute);
+                  },
+                  child: EmployeeTile(
+                    index: index,
+                  ),
+                );
+              }),
     ));
   }
 }

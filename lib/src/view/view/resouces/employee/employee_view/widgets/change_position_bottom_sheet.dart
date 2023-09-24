@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
+import 'package:evantez/src/model/repository/auth/auth_controller.dart';
 import 'package:evantez/src/model/repository/resource/employee_repository.dart';
 import 'package:evantez/src/view/core//constants/constants.dart';
 import 'package:evantez/src/view/core//themes/colors.dart';
@@ -56,6 +59,7 @@ class ChangeEmpPosition {
 
   Widget postitonListing(BuildContext context, Size kSize) {
     final controller = context.watch<EmployeesController>();
+    final authController = context.watch<AuthController>();
     return SizedBox(
       height: kSize.height * 0.4,
       width: kSize.width,
@@ -79,10 +83,12 @@ class ChangeEmpPosition {
               child: Row(
                 children: [
                   InkWell(
-                    onTap: () {
+                    onTap: () async {
                       log("Selected Position = ${positions[index].toJson()}");
 
-                      controller.changePosition(positions[index]);
+                      await controller.changePosition(positions[index],
+                          id: controller.employeeData?.id ?? 0,
+                          token: authController.accesToken ?? '');
                       Navigator.pop(context);
                     },
                     child: Text(

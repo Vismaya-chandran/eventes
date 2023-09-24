@@ -60,7 +60,7 @@ class _DatePickerContainerState extends State<DatePickerContainer> {
                 final DateTime? picked = await showDatePicker(
                   context: context,
                   initialDate: widget.initialDate ?? DateTime.now(),
-                  firstDate: DateTime(2015),
+                  firstDate: DateTime(1975),
                   lastDate: DateTime(2101),
                   builder: (BuildContext context, Widget? child) {
                     return Theme(
@@ -136,4 +136,4 @@ class _DatePickerContainerState extends State<DatePickerContainer> {
   }
 }
 
-final apiFormat = DateFormat('yyyy-MM-dd');
+final apiFormat = DateFormat('dd/MM/yyyy');
